@@ -1,4 +1,4 @@
-FROM golang:1.22-alpine AS builder
+FROM golang:1.23-alpine AS builder
 
 WORKDIR /app
 
@@ -7,17 +7,27 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /greenlight ./cmd/api
+RUN CGO_ENABLED=0 GOOS=linux go build \
+    -ldflags="-w -s" \
+    -o /app/bin/api ./cmd/api
+
+RUN CGO_ENABLED=0 GOOS=linux go build \
+    -ldflags="-w -s" \
+    -o /app/bin/migrate ./cmd/migrate
 
 FROM alpine:3.18
 
 WORKDIR /root/
 
-COPY --from=builder /greenlight .
-COPY --from=builder /app/migrations ./migrations
+COPY --from=builder /app/bin/api ./greenlight
+COPY --from=builder /app/bin/migrate ./migrate
 
-EXPOSE ${SERVER_PORT}
+COPY --from=builder /app/migrations/*.sql ./migrations/
 
-RUN chmod +x /root/greenlight
+RUN chmod +x /root/greenlight /root/migrate \
+    && apk --no-cache add tzdata
 
-ENTRYPOINT ["./greenlight"]
+ENV SERVER_PORT=4000 \
+    MIGRATE_PATH=/root/migrations
+
+ENTRYPOINT ["/root/greenlight"]
