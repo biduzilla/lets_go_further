@@ -2,6 +2,7 @@ package data
 
 import (
 	"greenlight/internal/validator"
+	"slices"
 	"strings"
 )
 
@@ -10,6 +11,14 @@ type Filters struct {
 	PageSize     int
 	Sort         string
 	SortSafelist []string
+}
+
+func (f Filters) limit() int {
+	return f.PageSize
+}
+
+func (f Filters) offset() int {
+	return (f.Page - 1) * f.PageSize
 }
 
 func ValidateFilters(v *validator.Validator, f Filters) {
@@ -21,10 +30,8 @@ func ValidateFilters(v *validator.Validator, f Filters) {
 }
 
 func (f Filters) sortColumn() string {
-	for _, safeValue := range f.SortSafelist {
-		if f.Sort == safeValue {
-			return strings.TrimPrefix(f.Sort, "-")
-		}
+	if slices.Contains(f.SortSafelist, f.Sort) {
+		return strings.TrimPrefix(f.Sort, "-")
 	}
 	panic("unsafe sort parameter: " + f.Sort)
 }
