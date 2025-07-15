@@ -5,6 +5,11 @@ import (
 	"net/http"
 )
 
+func (app *application) rateLimitExceededResponse(w http.ResponseWriter, r *http.Request) {
+	message := "rate limit exceed"
+	app.errorResponse(w, r, http.StatusTooManyRequests, message)
+}
+
 func (app *application) logError(r *http.Request, err error) {
 	app.logger.PrintError(err, map[string]string{
 		"request_method": r.Method,
