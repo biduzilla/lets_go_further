@@ -7,8 +7,9 @@ import (
 )
 
 type Conf struct {
-	Server ConfServer
-	DB     ConfDB
+	Server      ConfServer
+	DB          ConfDB
+	RateLimiter ConfRL
 }
 
 type ConfServer struct {
@@ -21,6 +22,12 @@ type ConfDB struct {
 	MaxOpenConns int    `env:"DB_MAX_OPEN_CONNS,required"`
 	MaxIdleConns int    `env:"DB_MAX_IDLE_CONNS,required"`
 	MaxIdleTime  string `env:"DB_MAX_IDLE_TIME,required"`
+}
+
+type ConfRL struct {
+	RPS     float64 `env:"LIMITER_RPS,required"`
+	Burst   int     `env:"LIMITER_BURST,required"`
+	Enabled bool    `env:"LIMITER_ENABLED,required"`
 }
 
 func New() *Conf {
