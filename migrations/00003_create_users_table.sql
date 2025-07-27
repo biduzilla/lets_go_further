@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE EXTENSION IF NOT EXISTS citext; -- Adicione esta linha!
+CREATE EXTENSION IF NOT EXISTS citext;
 
 CREATE TABLE IF NOT EXISTS users (
     id bigserial PRIMARY KEY,
@@ -16,5 +16,5 @@ CREATE TABLE IF NOT EXISTS users (
 -- +goose Down
 -- +goose StatementBegin
 DROP TABLE IF EXISTS users;
-DROP EXTENSION IF EXISTS citext; -- Opcional: remova a extensão no rollback
+DROP EXTENSION IF EXISTS citext;
 -- +goose StatementEnd
