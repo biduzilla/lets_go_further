@@ -7,6 +7,7 @@ import (
 	"greenlight/configuration"
 	"greenlight/internal/data"
 	"greenlight/internal/jsonlog"
+	"greenlight/internal/mailer"
 	"os"
 	"time"
 
@@ -29,12 +30,20 @@ type config struct {
 		burst   int
 		enabled bool
 	}
+	smtp struct {
+		host     string
+		port     int
+		username string
+		password string
+		sender   string
+	}
 }
 
 type application struct {
 	config config
 	logger *jsonlog.Logger
 	models data.Models
+	mailer mailer.Mailer
 }
 
 func main() {
@@ -49,6 +58,12 @@ func main() {
 	flag.Float64Var(&cfg.limiter.rps, "limiter-rps", c.RateLimiter.RPS, "Rate limiter maximum requests per second")
 	flag.IntVar(&cfg.limiter.burst, "limiter-burst", c.RateLimiter.Burst, "Rate limiter maximum burst")
 	flag.BoolVar(&cfg.limiter.enabled, "limiter-enabled", c.RateLimiter.Enabled, "Enable rate limiter")
+	flag.StringVar(&cfg.smtp.host, "smtp-host", c.Mail.HOST, "SMTP host")
+	flag.IntVar(&cfg.smtp.port, "smtp-port", c.Mail.PORT, "SMTP port")
+	flag.StringVar(&cfg.smtp.username, "smtp-username", c.Mail.USERNAME, "SMTP username")
+	flag.StringVar(&cfg.smtp.password, "smtp-password", c.Mail.PASSWORD, "SMTP password")
+	flag.StringVar(&cfg.smtp.sender, "smtp-sender", "Greenlight <no-reply@greenlight.alexedwards.net>", "SMTP sender")
+	flag.Parse()
 	flag.Parse()
 
 	logger := jsonlog.New(os.Stdout, jsonlog.LevelInfo)
@@ -65,6 +80,7 @@ func main() {
 		config: cfg,
 		logger: logger,
 		models: data.NewModels(db),
+		mailer: mailer.New(cfg.smtp.host, cfg.smtp.port, cfg.smtp.username, cfg.smtp.password, cfg.smtp.sender),
 	}
 
 	err = app.server()

@@ -10,6 +10,7 @@ type Conf struct {
 	Server      ConfServer
 	DB          ConfDB
 	RateLimiter ConfRL
+	Mail        ConfMAIL
 }
 
 type ConfServer struct {
@@ -28,6 +29,13 @@ type ConfRL struct {
 	RPS     float64 `env:"LIMITER_RPS,required"`
 	Burst   int     `env:"LIMITER_BURST,required"`
 	Enabled bool    `env:"LIMITER_ENABLED,required"`
+}
+
+type ConfMAIL struct {
+	HOST     string `env:"EMAIL_HOST,required"`
+	PORT     int    `env:"EMAIL_POST,required"`
+	USERNAME string `env:"EMAIL_USERNAME,required"`
+	PASSWORD string `env:"LIMITEEMAIL_PASSWORDR_ENABLED,required"`
 }
 
 func New() *Conf {
