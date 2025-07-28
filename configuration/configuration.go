@@ -35,7 +35,7 @@ type ConfMAIL struct {
 	HOST     string `env:"EMAIL_HOST,required"`
 	PORT     int    `env:"EMAIL_POST,required"`
 	USERNAME string `env:"EMAIL_USERNAME,required"`
-	PASSWORD string `env:"LIMITEEMAIL_PASSWORDR_ENABLED,required"`
+	PASSWORD string `env:"EMAIL_PASSWORD,required"`
 }
 
 func New() *Conf {
