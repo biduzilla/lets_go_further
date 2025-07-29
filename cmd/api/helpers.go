@@ -18,6 +18,18 @@ import (
 
 type envelope map[string]any
 
+func (app *application) background(fn func()) {
+	go func() {
+		defer func() {
+			if err := recover(); err != nil {
+				app.logger.PrintFatal(fmt.Errorf("%s", err), nil)
+			}
+		}()
+
+		fn()
+	}()
+}
+
 func (app *application) readString(qs url.Values, key string, defaultValue string) string {
 	s := qs.Get(key)
 
