@@ -19,7 +19,7 @@ type Token struct {
 	Plaintext string    `json:"token"`
 	Hash      []byte    `json:"-"`
 	UserID    int64     `json:"-"`
-	Expirity  time.Time `json:"espirity"`
+	Expiry    time.Time `json:"expiry"`
 	Scope     string    `json:"-"`
 }
 
@@ -42,7 +42,7 @@ func (m TokenModel) Insert(token *Token) error {
 	INSERT INTO tokens (hash, user_id, expiry, scope)
 	VALUES ($1, $2, $3, $4)`
 
-	args := []interface{}{token.Hash, token.UserID, token.Expirity, token.Scope}
+	args := []interface{}{token.Hash, token.UserID, token.Expiry, token.Scope}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -70,9 +70,9 @@ func ValidateTokenPlaintext(v *validator.Validator, tokenPlaintext string) {
 
 func generateToken(userID int64, ttl time.Duration, scope string) (*Token, error) {
 	token := &Token{
-		UserID:   userID,
-		Expirity: time.Now().Add(ttl),
-		Scope:    scope,
+		UserID: userID,
+		Expiry: time.Now().Add(ttl),
+		Scope:  scope,
 	}
 
 	randomBytes := make([]byte, 16)
