@@ -38,7 +38,7 @@ func (app *application) requireActivatedUser(next http.HandlerFunc) http.Handler
 		next.ServeHTTP(w, r)
 	})
 
-	return app.requireActivatedUser(fn)
+	return app.requireAuthenticatedUser(fn)
 }
 
 func (app *application) authenticate(next http.Handler) http.Handler {
